@@ -44,6 +44,7 @@ export default function Gauge({ containerStyle, value, progressValueStyle, size,
 
 const styles = StyleSheet.create({
     container: {
-        padding: 20
+        padding: 20,
+        flex: 1,
     }
 })
