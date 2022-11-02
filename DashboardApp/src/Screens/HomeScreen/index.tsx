@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Gauge from '../../Components/Gauge';
+import Gauge from '../../components/Gauge';
 
 export default function HomeScreen() {
     const [speed, setSpeed] = useState(100);
@@ -22,8 +22,9 @@ export default function HomeScreen() {
 
             <View style={styles.aux}>
                 <Icon name={'fuel'} size={35} />
-
                 <Icon name={'coolant-temperature'} size={35} />
+                <View>
+                </View>
             </View>
         </View>
     )
