@@ -15,10 +15,11 @@ interface GaugeProps {
     titleStyle: object;
     activeStrokeColor: string;
     strokeColorConfig: any;
+    dashedStrokeConfig: any
 
 }
 
-export default function Gauge({ containerStyle, value, progressValueStyle, size, progressValueColor, maxValue, title, titleColor, titleStyle, strokeColorConfig, activeStrokeColor }: GaugeProps) {
+export default function Gauge({ containerStyle, value, progressValueStyle, size, progressValueColor, maxValue, title, titleColor, titleStyle, strokeColorConfig, activeStrokeColor, dashedStrokeConfig }: GaugeProps) {
     return (
         <View style={[styles.container, containerStyle]}>
             <CircularProgress
@@ -33,10 +34,7 @@ export default function Gauge({ containerStyle, value, progressValueStyle, size,
                 titleStyle={titleStyle}
                 strokeColorConfig={strokeColorConfig}
                 activeStrokeColor={activeStrokeColor}
-                dashedStrokeConfig={{
-                    count: 50,
-                    width: 2.5,
-                }}
+                dashedStrokeConfig={dashedStrokeConfig}
             />
         </View>
     )
@@ -45,6 +43,9 @@ export default function Gauge({ containerStyle, value, progressValueStyle, size,
 const styles = StyleSheet.create({
     container: {
         padding: 20,
-        flex: 1,
+        // flex: 1,
+        alignItems: 'center',
+        // backgroundColor: 'white'
+
     }
 })
