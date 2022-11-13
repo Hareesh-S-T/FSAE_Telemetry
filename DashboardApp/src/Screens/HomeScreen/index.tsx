@@ -1,20 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, View, Image, StyleSheet } from 'react-native';
 import MCIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Gauge from '../../components/Gauge';
+import Paho from "paho-mqtt";
+import init from 'react_native_mqtt';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+init({
+    size: 10000,
+    storageBackend: AsyncStorage,
+    defaultExpires: 3600 * 24,
+    enableCache: true,
+    reconnect: {
+        sync: {}
+    }
+});
+
+const client = new Paho.Client('192.168.1.201', 1883, `AndroidApp-${Math.random() * 100}`);
 
 export default function HomeScreen() {
+
     const [speed, setSpeed] = useState(100);
     const [rpm, setRpm] = useState(2500);
     const [fuel, setFuel] = useState(60);
     const [temp, setTemp] = useState(80);
     const [gear, setGear] = useState('N');
+
+    function onMessage(message: any) {
+        setTemp(parseInt(message.payloadString));
+    }
+    useEffect(() => {
+        client.connect({
+            onSuccess: () => {
+                client.subscribe("Telemetry");
+                client.onMessageArrived = onMessage;
+            },
+            onFailure: () => {
+
+            }
+        })
+    }, []);
+
     return (
         <>
             <Image source={require('../../assets/images/Gradient2.png')} style={{ position: 'absolute', height: '100%', width: '100%' }} />
             <View style={styles.container}>
 
-                <Gauge containerStyle={{}} value={rpm} progressValueStyle={styles.gaugeValue} size={120} maxValue={11500} progressValueColor={'white'} title={'rpm'} titleColor={'red'} titleStyle={styles.gauge} strokeColorConfig={[
+                <Gauge containerStyle={{ paddingLeft: 0 }} value={rpm} progressValueStyle={styles.gaugeValue} size={120} maxValue={11500} progressValueColor={'white'} title={'rpm'} titleColor={'rgb(150,0,50)'} titleStyle={styles.gauge} strokeColorConfig={[
                     { color: 'green', value: 0 },
                     { color: 'yellow', value: 8000 },
                     { color: 'red', value: 10000 }
@@ -36,11 +69,11 @@ export default function HomeScreen() {
                     <View style={styles.gearIndicator}>
                         <Text style={styles.gearPlusMinus}>{'\u00B1'}</Text>
                         <Image source={require('../../assets/images/Gears.png')} style={styles.gearLogo} />
-                        <Text style={[styles.gearText, gear == 'N' ? { color: 'red' } : { color: 'white' }]}>{gear}</Text>
+                        <Text style={[styles.gearText, gear == 'N' ? { color: 'rgb(150,0,50)' } : { color: 'white' }]}>{gear}</Text>
                     </View>
 
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <MCIcon name={'fuel'} style={styles.icon} size={30} />
+                        <MCIcon name={'gas-station'} style={styles.icon} size={30} />
 
                         <Gauge containerStyle={{ padding: 0, margin: 0 }} value={fuel} progressValueStyle={[styles.gaugeValue, { padding: 0 }]} size={60} maxValue={100} progressValueColor={'white'} title={'%'} titleColor={'white'} titleStyle={[styles.gauge, { fontSize: 20 }]} activeStrokeColor={'#05ED00'} strokeColorConfig={[
                             { color: '#FF2500', value: 0 },
@@ -77,7 +110,8 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'space-evenly',
         alignItems: 'center',
-        flexDirection: 'row'
+        flexDirection: 'row',
+        padding: 20,
     },
     gauge: {
         fontWeight: 'bold',
@@ -114,8 +148,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
     },
     icon: {
-        // padding: 5,\
+        padding: 10,
         color: 'white',
+        // backgroundColor: 'red'
     },
     iconText: {
         fontStyle: 'italic',

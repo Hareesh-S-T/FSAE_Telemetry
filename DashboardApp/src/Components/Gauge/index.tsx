@@ -35,6 +35,7 @@ export default function Gauge({ containerStyle, value, progressValueStyle, size,
                 strokeColorConfig={strokeColorConfig}
                 activeStrokeColor={activeStrokeColor}
                 dashedStrokeConfig={dashedStrokeConfig}
+                inActiveStrokeColor={'rgb(85,85,85)'}
             />
         </View>
     )
