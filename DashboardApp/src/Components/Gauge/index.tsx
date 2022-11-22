@@ -26,7 +26,7 @@ export default function Gauge({ containerStyle, value, progressValueStyle, size,
                 value={value}
                 progressValueStyle={progressValueStyle}
                 radius={size}
-                duration={1000}
+                duration={100}
                 progressValueColor={progressValueColor}
                 maxValue={maxValue}
                 title={title}

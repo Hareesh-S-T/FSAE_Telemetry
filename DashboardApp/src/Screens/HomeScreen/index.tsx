@@ -2,45 +2,93 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, Image, StyleSheet } from 'react-native';
 import MCIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Gauge from '../../components/Gauge';
-import Paho from "paho-mqtt";
-import init from 'react_native_mqtt';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// var mqtt = require('@taoqf/react-native-mqtt')
+
+// const options = {
+//     username: 'user',
+//     password: 'admin',
+//     clientId: 'Android'
+// }
+
+// const client = mqtt.connect('mqtt://192.168.1.201:1883', options);
+// client.on('connect', function () {
+//     console.log("Connected");
+//     client.subscribe('Telemetry', function (err: any) {
+//         if (err) {
+//             console.log(err);
+//         }
+//     })
+// })
+
+// client.on('message', function (topic: any, message: any) {
+//     let body = JSON.parse(message);
+//     console.log(body);
+//     console.log("Coolant Temperature: ", body.coolantTemp);
+//     console.log("Fuel Level: ", body.fuelLevel);
+// });
 
 
-init({
-    size: 10000,
-    storageBackend: AsyncStorage,
-    defaultExpires: 3600 * 24,
-    enableCache: true,
-    reconnect: {
-        sync: {}
-    }
-});
+import MQTT from 'sp-react-native-mqtt';
 
-const client = new Paho.Client('192.168.1.201', 1883, `AndroidApp-${Math.random() * 100}`);
+
+
 
 export default function HomeScreen() {
-
+    const [fetchedData, setFetchedData] = useState({});
     const [speed, setSpeed] = useState(100);
     const [rpm, setRpm] = useState(2500);
-    const [fuel, setFuel] = useState(60);
-    const [temp, setTemp] = useState(80);
+    const [fuel, setFuel] = useState(0);
+    const [temp, setTemp] = useState(0);
     const [gear, setGear] = useState('N');
 
-    function onMessage(message: any) {
-        setTemp(parseInt(message.payloadString));
-    }
-    useEffect(() => {
-        client.connect({
-            onSuccess: () => {
-                client.subscribe("Telemetry");
-                client.onMessageArrived = onMessage;
-            },
-            onFailure: () => {
 
-            }
-        })
-    }, []);
+    useEffect(() => {
+
+        MQTT.createClient({
+            uri: 'mqtt://192.168.1.201:1883',
+            clientId: `Android_${Math.random().toString(16).slice(3)}`,
+            user: 'user',
+            pass: 'admin',
+            auth: true
+        }).then(function (client) {
+
+            // client.on('closed', function () {
+            //     console.log('mqtt.event.closed');
+            // });
+
+            // client.on('error', function (msg) {
+            //     console.log('mqtt.event.error', msg);
+            // });
+
+            // client.on('connect',
+            //     function () {
+            //         console.log('Connected');
+            //     });
+
+
+            client.subscribe('Telemetry', 0);
+
+            client.on('message', function (msg) {
+                // console.log('Message Received: ', msg);
+                setFetchedData(JSON.parse(msg.data));
+                console.log(fetchedData);
+                if (!isNaN(fetchedData.coolantTemp)) {
+                    setTemp(parseInt(fetchedData.coolantTemp));
+                }
+                if (!isNaN(fetchedData.fuelLevel)) {
+                    setFuel(parseInt(fetchedData.fuelLevel));
+                }
+            });
+
+
+            client.disconnect();
+            client.connect();
+        }).catch(function (err) {
+            console.log(err);
+        });
+
+    });
 
     return (
         <>

@@ -250,6 +250,8 @@ android {
 }
 
 dependencies {
+    // implementation ':sp-react-native-mqtt'
+    
     implementation fileTree(dir: "libs", include: ["*.jar"])
 
     //noinspection GradleDynamicVersion
