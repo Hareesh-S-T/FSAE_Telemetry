@@ -31,9 +31,6 @@ import Gauge from '../../components/Gauge';
 
 import MQTT from 'sp-react-native-mqtt';
 
-
-
-
 export default function HomeScreen() {
     const [fetchedData, setFetchedData] = useState({});
     const [speed, setSpeed] = useState(100);
@@ -44,7 +41,6 @@ export default function HomeScreen() {
 
 
     useEffect(() => {
-
         MQTT.createClient({
             uri: 'mqtt://192.168.1.201:1883',
             clientId: `Android_${Math.random().toString(16).slice(3)}`,
@@ -52,21 +48,6 @@ export default function HomeScreen() {
             pass: 'admin',
             auth: true
         }).then(function (client) {
-
-            // client.on('closed', function () {
-            //     console.log('mqtt.event.closed');
-            // });
-
-            // client.on('error', function (msg) {
-            //     console.log('mqtt.event.error', msg);
-            // });
-
-            // client.on('connect',
-            //     function () {
-            //         console.log('Connected');
-            //     });
-
-
             client.subscribe('Telemetry', 0);
 
             client.on('message', function (msg) {
@@ -80,14 +61,11 @@ export default function HomeScreen() {
                     setFuel(parseInt(fetchedData.fuelLevel));
                 }
             });
-
-
             client.disconnect();
             client.connect();
         }).catch(function (err) {
             console.log(err);
         });
-
     });
 
     return (
