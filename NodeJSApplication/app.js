@@ -4,7 +4,7 @@ var options = {
     password: 'admin',
     clientId: 'Node'
 };
-var client = mqtt.connect('mqtt://192.168.123.159:1883', options);
+var client = mqtt.connect('mqtt://192.168.1.201:1883', options);
 client.on('connect', function () {
     console.log("Connected");
     client.subscribe('Telemetry', function (err) {

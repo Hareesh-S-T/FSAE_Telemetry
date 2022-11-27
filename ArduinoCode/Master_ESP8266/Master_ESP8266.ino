@@ -2,13 +2,10 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
-// const char* ssid = "NETGEAR33";
-// const char* pw = "sillyoctopus391";
-
 const char* ssid = "OP7TPro";
 const char* pw = "0987654321";
 
-const char* mqtt_server = "192.168.123.159";
+const char* mqtt_server = "192.168.1.201";
 const int mqtt_port = 1883;
 const char* mqtt_user = "user";
 const char* mqtt_pw = "admin";
@@ -58,7 +55,7 @@ void reconnect() {
 }
 
 void setup() {
-  Serial.begin(4800);
+  Serial.begin(9600);
   while (!Serial) {
   }
   setup_wifi();
@@ -71,9 +68,7 @@ void loop() {
   if (!client.connected()) {
     reconnect();
   }
-
   client.loop();
-
   StaticJsonDocument<300> body;
   DeserializationError err = deserializeJson(body, Serial);
   if (err == DeserializationError::Ok) {
@@ -81,10 +76,11 @@ void loop() {
     Serial.println(body["coolantTemp"].as<int>());
     Serial.print("fuelLevel = ");
     Serial.println(body["fuelLevel"].as<int>());
-
     char msg[256];
     serializeJson(body, msg);
     client.publish("Telemetry", msg);
+    // Serial.println("TESTING");
+    delay(100);
 
   } else {
     Serial.print("deserializeJson() returned ");

@@ -2,33 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, Image, StyleSheet } from 'react-native';
 import MCIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Gauge from '../../components/Gauge';
-
-// var mqtt = require('@taoqf/react-native-mqtt')
-
-// const options = {
-//     username: 'user',
-//     password: 'admin',
-//     clientId: 'Android'
-// }
-
-// const client = mqtt.connect('mqtt://192.168.1.201:1883', options);
-// client.on('connect', function () {
-//     console.log("Connected");
-//     client.subscribe('Telemetry', function (err: any) {
-//         if (err) {
-//             console.log(err);
-//         }
-//     })
-// })
-
-// client.on('message', function (topic: any, message: any) {
-//     let body = JSON.parse(message);
-//     console.log(body);
-//     console.log("Coolant Temperature: ", body.coolantTemp);
-//     console.log("Fuel Level: ", body.fuelLevel);
-// });
-
-
 import MQTT from 'sp-react-native-mqtt';
 
 export default function HomeScreen() {
@@ -39,17 +12,18 @@ export default function HomeScreen() {
     const [temp, setTemp] = useState(0);
     const [gear, setGear] = useState('N');
 
+    MQTT.createClient({
+        uri: 'mqtt://192.168.1.201:1883',
+        clientId: `Android_${Math.random().toString(16).slice(3)}`,
+        user: 'user',
+        pass: 'admin',
+        auth: true,
+        automaticReconnect:false
+    }).then(function (client) {
 
-    useEffect(() => {
-        MQTT.createClient({
-            uri: 'mqtt://192.168.1.201:1883',
-            clientId: `Android_${Math.random().toString(16).slice(3)}`,
-            user: 'user',
-            pass: 'admin',
-            auth: true
-        }).then(function (client) {
-            client.subscribe('Telemetry', 0);
+        client.subscribe('Telemetry', 0);
 
+        setTimeout(() => {
             client.on('message', function (msg) {
                 // console.log('Message Received: ', msg);
                 setFetchedData(JSON.parse(msg.data));
@@ -60,12 +34,13 @@ export default function HomeScreen() {
                 if (!isNaN(fetchedData.fuelLevel)) {
                     setFuel(parseInt(fetchedData.fuelLevel));
                 }
+                client.disconnect();
             });
-            client.disconnect();
-            client.connect();
-        }).catch(function (err) {
-            console.log(err);
-        });
+        }, 500);
+        client.connect();
+
+    }).catch(function (err) {
+        console.log(err);
     });
 
     return (

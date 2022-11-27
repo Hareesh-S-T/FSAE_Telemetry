@@ -9,14 +9,15 @@ int coolantTemp, fuelLevel = 0;
 
 void setup() {
   Serial.begin(19200);
-  Serial1.begin(4800);
+  Serial1.begin(9600);
 }
 void loop() {
   int reading = analogRead(tempPin);
   coolantTemp = 24.94 + 0.01287 * reading + 0.0001056 * reading * reading;
 
   reading = analogRead(fuelPin);
-  fuelLevel = 1.96 * reading - 8.72;
+  fuelLevel = 1.96 * reading - 10.72;
+// fuelLevel = reading;
 
   Serial.print("C: ");
   Serial.println(coolantTemp);
@@ -29,5 +30,5 @@ void loop() {
 
   serializeJson(body, Serial1);
 
-  delay(200);
+  delay(100);
 }
